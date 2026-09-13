@@ -69,4 +69,6 @@ Rules: confidence must be 0-100. If validation.winRate is below 80, or validatio
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => console.log(`TradePilot AI server running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`TradePilot AI server running on port ${PORT}`);
+});
