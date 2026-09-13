@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TradePilot AI — Live Market Scanner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="nav">
+  <div class="brand"><span class="brand-mark">◈</span> TradePilot AI</div>
+  <nav><a href="#analyzer">Scanner</a><a href="#journal">Journal</a><a href="#backtest">Backtest</a><a href="#calendar">Calendar</a></nav>
+  <button class="btn ghost" onclick="document.getElementById('apiBox').classList.toggle('show')">Data settings</button>
+</header>
+
+<main>
+<section class="hero">
+  <div class="badge">LIVE MARKET SCANNER</div>
+  <h1>AI chart vision + real-time Gold market analysis.</h1>
+  <p>Upload a Gold chart and the vision layer reads the chart structure, patterns and visible levels, then cross-checks them against live XAU/USD candles. A historical validation gate targets 80% win rate; it never guarantees 80% future accuracy.</p>
+  <a class="btn primary" href="#analyzer">Open scanner</a>
+  <p class="small">Analysis is probabilistic. No trading system can guarantee 100% accuracy.</p>
+</section>
+
+<section class="panel" id="analyzer">
+  <div class="section-title">
+    <div><span class="eyebrow">MARKET SCANNER</span><h2>Live analysis</h2></div>
+    <span class="status" id="dataStatus">● Ready</span>
+  </div>
+
+  <div class="upload-card" id="uploadCard">
+    <div class="upload-copy">
+      <span class="upload-icon">↥</span>
+      <div><b>Upload chart screenshot</b><small>PNG, JPG or WEBP · Drag & drop or choose a file</small></div>
+    </div>
+    <input id="chartUpload" type="file" accept="image/*,.png,.jpg,.jpeg,.webp" aria-label="Choose chart image" />
+    <button type="button" class="btn upload-btn" id="chooseChartBtn">Choose chart image</button>
+    <div class="upload-preview" id="uploadPreview"><img id="uploadedImage" alt="Uploaded chart preview"><button type="button" id="removeUpload">×</button></div>
+    <div class="scan-error" id="scanError" role="alert"></div>
+  </div>
+
+  <div class="controls">
+    <label>Market
+      <select id="marketType">
+        <option value="gold" selected>Gold</option>
+        <option value="crypto">Crypto</option>
+        <option value="forex">Forex</option>
+      </select>
+    </label>
+    <label>Symbol
+      <select id="symbol">
+        <option value="XAU/USD">XAU/USD — Gold</option>
+        <option value="BTCUSDT">BTCUSDT</option>
+        <option value="ETHUSDT">ETHUSDT</option>
+        <option value="SOLUSDT">SOLUSDT</option>
+        <option value="BNBUSDT">BNBUSDT</option>
+        <option value="XRPUSDT">XRPUSDT</option>
+      </select>
+    </label>
+    <label>Timeframe
+      <select id="timeframe">
+        <option value="1min">1 Minute</option>
+        <option value="5min">5 Minute</option>
+        <option value="15min">15 Minute</option>
+        <option value="30min">30 Minute</option>
+        <option value="1h">1 Hour</option>
+        <option value="1day">1 Day</option>
+      </select>
+    </label>
+    <button id="scanBtn" class="btn primary scan-btn">Scan live market</button>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head"><b id="chartTitle">BTCUSDT · 1 Minute</b><span id="priceBadge">--</span></div>
+    <canvas id="marketChart" height="250"></canvas>
+  </div>
+
+  <div class="scan-animation" id="scanAnimation" aria-live="polite">
+    <div class="scan-animation-inner">
+      <div class="scan-head"><span class="scan-ring">◌</span><div><span class="eyebrow">REAL-TIME ANALYSIS</span><b id="scanText">Fetching live candles...</b></div><strong id="scanPercent">0%</strong></div>
+      <div class="scan-progress"><i id="scanProgress"></i></div>
+      <div class="scan-status"><span class="scan-dot"></span><span>Live market data + chart structure</span></div>
+    </div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="result-top">
+      <div><span class="eyebrow" id="resultEyebrow">AI CHART-VISION + LIVE MARKET</span><h3 id="resultSymbol">BTCUSDT · 1m</h3></div>
+      <div class="score"><span id="score">--</span><small>AI confidence</small></div>
+    </div>
+    <div class="metrics">
+      <div><small>Signal</small><strong id="bias">--</strong></div>
+      <div><small>Price</small><strong id="entry">--</strong></div>
+      <div><small>Stop loss</small><strong id="sl">--</strong></div>
+      <div><small>TP1</small><strong id="tp1">--</strong></div>
+      <div><small>TP2</small><strong id="tp2">--</strong></div>
+    </div>
+    <div class="signals">
+      <span>EMA trend <b id="emaSignal">--</b></span>
+      <span>RSI <b id="rsiSignal">--</b></span>
+      <span>MACD <b id="macdSignal">--</b></span>
+      <span>Momentum <b id="momSignal">--</b></span>
+    </div>
+    <p id="rationale">Upload a chart and run a scan to combine AI vision with live market candles.</p>
+    <div class="ai-grid"><div><small>AI chart structure</small><b id="visualStructure">--</b></div><div><small>Validation gate</small><b id="validationBadge">--</b></div><div><small>AI agreement</small><b id="aiAgreement">--</b></div></div>
+    <p class="ai-reason" id="aiReason">AI vision is only available when the local Node server has an OpenAI API key.</p>
+    <div class="disclaimer">Technical model only. It does not predict the future or guarantee profit. Always verify price, spread, liquidity and risk before trading.</div>
+  </div>
+</section>
+
+<section class="panel api-box" id="apiBox">
+  <span class="eyebrow">FOREX & GOLD DATA</span>
+  <h2>Twelve Data API key</h2>
+  <p>Crypto can use Binance public market data without a key. Forex and XAU/USD use Twelve Data; paste your own API key here. Agar browser key na dein to server `.env` mein `TWELVE_DATA_API_KEY` set kar sakte hain. Key ko public code mein expose na karein.</p>
+  <div class="api-row">
+    <input id="tdKey" type="password" placeholder="Paste Twelve Data API key">
+    <button class="btn primary" id="saveKey">Save for this session</button>
+  </div>
+  <small id="keyStatus">No browser key saved. Server key can also be used.</small>
+</section>
+
+<section class="cards" id="journal">
+<article class="panel">
+<span class="eyebrow">AUTO JOURNAL</span><h2>Recent scans</h2>
+<div id="recentScans"><div class="trade"><span>Waiting for live scans</span><b>--</b></div></div>
+</article>
+<article class="panel">
+<span class="eyebrow">REAL MARKET ENGINE</span><h2>AI vision + live market engine</h2>
+<p class="muted">The chart image is analyzed by a server-side vision model for structure, patterns and visible support/resistance. Live OHLC candles remain the source of truth for current price and are cross-checked with EMA, RSI, MACD, ATR and higher-timeframe data. A historical validation gate targets 80% win rate but never guarantees it.</p>
+<div class="progress"><i id="engineBar" style="width:72%"></i></div>
+<div class="stats-row"><span>AI + technical factors <b>12+</b></span><span>Data source <b id="dataSource">--</b></span></div>
+</article>
+</section>
+
+<section class="panel" id="backtest">
+<span class="eyebrow">HISTORICAL VALIDATION</span><h2>Backtest the live strategy on historical candles</h2>
+<p class="muted">Run a simple historical test using the selected market and timeframe. This is for validation, not a promise of future performance.</p>
+<button class="btn primary" id="runBacktest">Run backtest</button>
+<div id="backtestOutput" class="backtest-output"></div>
+</section>
+
+<section class="panel" id="calendar">
+<span class="eyebrow">MARKET EVENTS</span><h2>Calendar</h2>
+<div class="event"><time>LIVE</time><div><b>Use your preferred economic calendar</b><span>Event data is not fabricated by this demo.</span></div></div>
+</section>
+</main>
+<footer>TradePilot AI · Live market technical scanner · Educational use only · Not financial advice</footer>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
