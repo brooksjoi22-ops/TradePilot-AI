@@ -38,8 +38,8 @@ app.post('/api/analyze-chart', async (req,res)=>{
     if(!process.env.OPENAI_API_KEY) return res.status(503).json({error:'OPENAI_API_KEY is not configured on the server.'});
     const {imageData,symbol,timeframe,market,liveCandles=[],higherCandles=[],technical={},validation={}}=req.body||{};
     if(!imageData) return res.status(400).json({error:'Chart image is required.'});
-    const recent=liveCandles.slice(-80).map(x=>({t:x.t,o:x.o,h:x.h,l:x.l,c:x.c,v:x.v}));
-    const higher=higherCandles.slice(-40).map(x=>({t:x.t,o:x.o,h:x.h,l:x.l,c:x.c}));
+    const recent=liveCandles.slice(-30).map(x=>({t:x.t,o:x.o,h:x.h,l:x.l,c:x.c}));
+    const higher=higherCandles.slice(-15).map(x=>({t:x.t,o:x.o,h:x.h,l:x.l,c:x.c}));
     const prompt=`You are the chart-vision layer of a professional trading research scanner. Analyze the uploaded ${market} chart for ${symbol} on ${timeframe}. The image is the primary visual source for candles, visible structure, patterns, support/resistance and timeframe labels. The supplied live OHLC data is the authoritative source for the current market price and should be used to cross-check the chart.
 
 IMPORTANT: Never claim 80% accuracy. 'confidence' is a model confidence score, NOT historical accuracy. Do not invent a price that is not consistent with the supplied live price. Do not promise profit. The technical engine's bullish/bearish directional strength determines the final signal; your visual analysis is a confirmation layer, not a hard historical-validation gate.
@@ -60,7 +60,7 @@ Rules: confidence must be 0-100. Historical validation is informational only; ne
       model: MODEL,
       input:[{role:'user',content:[
         {type:'input_text',text:prompt},
-        {type:'input_image',image_url:imageData,detail:'high'}
+        {type:'input_image',image_url:imageData,detail:'low'}
       ]}]
     });
     const ai=cleanJson(response.output_text);
@@ -72,3 +72,7 @@ Rules: confidence must be 0-100. Historical validation is informational only; ne
 });
 
 app.listen(PORT,'0.0.0.0',()=>console.log(`TradePilot AI server running on port ${PORT}`));
+
+
+
+
