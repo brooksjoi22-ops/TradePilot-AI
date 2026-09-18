@@ -184,7 +184,7 @@ async function fileToDataUrl(file){
 }
 
 async function validationBacktest(data){
-  if(!Array.isArray(data)||data.length<220){
+  if(!Array.isArray(data)||data.length<200){
     return {trades:0,wins:0,losses:0,expired:0,winRate:0,pnlR:0,gate:false};
   }
 
@@ -199,7 +199,7 @@ async function validationBacktest(data){
     trades++;
     let result=null;
 
-    for(let j=i+1;j<=i+horizon;j++){
+    for(let j=i+1;j<data.length;j++){
       const bar=data[j];
 
       if(a.side==='BUY'){
