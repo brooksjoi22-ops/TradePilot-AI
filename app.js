@@ -247,7 +247,7 @@ async function aiVisionAnalyze(validation,technical){
   if(!uploadedChartFile) return null;
   try{
     const imageData=await fileToDataUrl(uploadedChartFile);
-    const r=await fetch('/api/analyze-chart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageData,symbol:symbol.value,timeframe:timeframe.value,market:marketType.value,liveCandles:candles.slice(-80),higherCandles:window.__higherCandles||[],technical,validation})});
+    const r=await fetch('/api/analyze-chart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageData,symbol:symbol.value,timeframe:timeframe.value,market:marketType.value,liveCandles:candles.slice(-30),higherCandles:window.__higherCandles||[],technical,validation})});
     const j=await r.json();
     if(!r.ok) throw new Error(j.error||'AI vision server unavailable');
     return j.analysis;
@@ -342,8 +342,7 @@ async function scanUploadedChart(){
   $('scanText').textContent='Running technical confluence + historical validation...';
   const technical=analyzeSeries(candles,higher);
   const validationData=await getData(timeframe.value,500);
-  const validation=await validationBacktest(validationData);
-  console.log('VALIDATION DEBUG:', {candles: validationData.length, validation});
+  const validation=await validationBacktest(validationData); console.log('VALIDATION DEBUG:',{candles:validationData.length,trades:validation.trades,wins:validation.wins,losses:validation.losses,expired:validation.expired,resolved:validation.resolved,winRate:validation.winRate});
   $('scanText').textContent='AI vision is reading chart structure and candle patterns...';
   const ai=await aiVisionAnalyze(validation,technical);
   if(ai){
@@ -407,6 +406,8 @@ scanBtn.onclick=async()=>{
 };
 $('runBacktest').onclick=async()=>{const out=$('backtestOutput');out.style.display='block';out.textContent='Loading historical candles and running backtest...';try{const data=await getData(timeframe.value,1000);if(data.length<200)throw new Error('Not enough historical candles');let wins=0,losses=0,trades=0,pnlR=0;for(let i=120;i<data.length-3;i++){const slice=data.slice(0,i+1),a=analyzeSeries(slice,[]);if(a.side==='WAIT')continue;trades++;const entry=data[i].c,sl=a.sl,tp=a.side==='BUY'?a.tp2:a.tp2;let result=0;for(let j=i+1;j<data.length;j++){if(a.side==='BUY'){if(data[j].l<=sl){result=-1;break}if(data[j].h>=tp){result=2.5;break}}else{if(data[j].h>=sl){result=-1;break}if(data[j].l<=tp){result=2.5;break}}}if(result>0){wins++;pnlR+=result}else{losses++;pnlR+=result}}const winRate=trades?wins/trades*100:0;out.innerHTML=`<b>Backtest result</b><br>Trades: ${trades}<br>Wins: ${wins}<br>Losses: ${losses}<br>Win rate: <strong>${winRate.toFixed(1)}%</strong><br>Net R: ${pnlR.toFixed(2)}R<br><small>Simple historical test of the same confluence engine; not a guarantee of future results.</small>`}catch(e){out.textContent='Backtest failed: '+e.message}};
 window.addEventListener('resize',draw);
+
+
 
 
 
