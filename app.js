@@ -260,24 +260,54 @@ async function aiVisionAnalyze(validation,technical){
 
 async function detectTimeframeFromImage(file){
   if(!window.Tesseract) return null;
+
   try{
-    const result=await Tesseract.recognize(file,'eng',{logger:m=>{
-      if(m.status==='recognizing text') $('scanText').textContent='Reading timeframe from chart... '+Math.round((m.progress||0)*100)+'%';
-    }});
-    const text=(result.data?.text||'').toLowerCase().replace(/\s+/g,' ');
+    const result=await Tesseract.recognize(file,'eng',{
+      logger:m=>{
+        if(m.status==='recognizing text'){
+          $('scanText').textContent='Reading timeframe from chart... '+Math.round((m.progress||0)*100)+'%';
+        }
+      }
+    });
+
+    const raw=(result.data?.text||'');
+    const text=raw
+      .toLowerCase()
+      .replace(/[|]/g,' ')
+      .replace(/(\d)\s*[-_]\s*(m|min|mins|minute|minutes|h|hr|hour|hours|d|day|daily)\b/g,'$1 $2')
+      .replace(/\s+/g,' ')
+      .trim();
+
+    console.log('TIMEFRAME OCR:',raw);
+
     const patterns=[
-      ['15min',/\b15\s*(m|min|minute|minutes)\b/],
-      ['5min',/\b5\s*(m|min|minute|minutes)\b/],
-      ['30min',/\b30\s*(m|min|minute|minutes)\b/],
-      ['1min',/\b1\s*(m|min|minute|minutes)\b/],
+      ['15min',/\b15\s*(m|min|mins|minute|minutes)\b/],
+      ['30min',/\b30\s*(m|min|mins|minute|minutes)\b/],
+      ['5min',/\b5\s*(m|min|mins|minute|minutes)\b/],
+      ['1min',/\b1\s*(m|min|mins|minute|minutes)\b/],
       ['1h',/\b1\s*(h|hr|hour|hours)\b/],
       ['1day',/\b1\s*(d|day|daily)\b/]
     ];
-    for(const [tf,re] of patterns) if(re.test(text)) return tf;
-  }catch(e){ console.warn('Timeframe OCR unavailable',e); }
+
+    for(const [tf,re] of patterns){
+      if(re.test(text)) return tf;
+    }
+
+    const compact=text.replace(/[^a-z0-9]/g,'');
+
+    if(compact.includes('15min')||compact.includes('15mins')) return '15min';
+    if(compact.includes('30min')||compact.includes('30mins')) return '30min';
+    if(compact.includes('5min')||compact.includes('5mins')) return '5min';
+    if(compact.includes('1min')||compact.includes('1mins')) return '1min';
+    if(compact.includes('1hour')||compact.includes('1hr')) return '1h';
+    if(compact.includes('1day')||compact.includes('daily')) return '1day';
+
+  }catch(e){
+    console.warn('Timeframe OCR unavailable',e);
+  }
+
   return null;
 }
-
 async function localChartFallback(){
   // Chart-only fallback: never pretend pixel color is AI or market price.
   // Estimate direction from multiple horizontal bands, candle-like edge contrast,
