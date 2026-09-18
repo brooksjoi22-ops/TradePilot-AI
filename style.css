@@ -22,8 +22,3 @@ footer{text-align:center;color:var(--muted);padding:35px;border-top:1px solid va
 .scan-error{display:none;margin:10px 0;padding:12px 14px;border:1px solid rgba(255,120,120,.35);border-radius:12px;background:rgba(120,30,30,.18);color:#ffd7d7;font-size:14px;line-height:1.5}.scan-error.show{display:block}
 .upload-btn{cursor:pointer;user-select:none;display:inline-flex;align-items:center;justify-content:center}.upload-card input[type=file]{pointer-events:auto}.upload-card:focus-within{border-color:#7cf5b2;box-shadow:0 0 0 2px rgba(124,245,178,.08)}
 .directional-meter{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.directional-meter>div{padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:#0c1c16}.directional-meter small{display:block;color:var(--muted);margin-bottom:5px}.directional-meter b{font-size:20px}.directional-meter>div:first-child b{color:var(--accent)}.directional-meter>div:last-child b{color:#ffb0b0}@media(max-width:700px){.directional-meter{grid-template-columns:1fr}}
-
-/* Upload visibility fix */
-.upload-card input[type=file]{position:relative!important;inset:auto!important;width:auto!important;height:auto!important;opacity:1!important;cursor:pointer!important;z-index:10!important;background:#102a20;color:white;padding:10px;border:1px solid #315a49;border-radius:10px}
-.upload-card .upload-copy{position:relative;z-index:1}
-
