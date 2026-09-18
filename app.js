@@ -1,4 +1,4 @@
-﻿const $=id=>document.getElementById(id);
+const $=id=>document.getElementById(id);
 const marketType=$('marketType'), symbol=$('symbol'), timeframe=$('timeframe'), scanBtn=$('scanBtn');
 const chart=$('marketChart'), ctx=chart.getContext('2d');
 let candles=[], recent=[], uploadedChartFile=null;
@@ -65,7 +65,7 @@ $('saveKey').onclick=()=>{const k=$('tdKey').value.trim();if(k){sessionStorage.s
 async function getData(forTf=null, limit=180){
   const type=marketType.value,sym=symbol.value,tf=forTf||timeframe.value,apiInterval=intervalMap[tf]||tf;
   if(type==='crypto'){
-    const r=await fetch(`https://api.binance.com/api/v3/klines?symbol=${encodeURIComponent(sym)}&interval=${apiInterval}&limit=${limit}`);if(!r.ok)throw new Error('Binance market data unavailable');const a=await r.json();$('dataSource').textContent='Binance';const parsed=a.map(x=>({t:x[0],o:Number(x[1]),h:Number(x[2]),l:Number(x[3]),c:Number(x[4]),v:Number(x[5])})).filter(x=>[x.o,x.h,x.l,x.c].every(Number.isFinite)); if(parsed.length>=30) return parsed;
+    const r=await fetch(`https://api.binance.com/api/v3/klines?symbol=${encodeURIComponent(sym)}&interval=${apiInterval}&limit=${limit}`);if(!r.ok)throw new Error('Binance market data unavailable');const a=await r.json();$('dataSource').textContent='Binance';const parsed=a.map(x=>({t:x[0],o:Number(x[1]),h:Number(x[2]),l:Number(x[3]),c:Number(x[4]),v:Number(x[5])})).filter(x=>[x.o,x.h,x.l,x.c].every(Number.isFinite)); if(parsed.length>=10) return parsed;
   }
   const key=sessionStorage.getItem('tdKey');
   let r;
@@ -88,7 +88,7 @@ async function getData(forTf=null, limit=180){
       if(Array.isArray(a)&&a.length){
         $('dataSource').textContent='Gold proxy (PAXGUSDT)';
         $('dataStatus').textContent='Ã¢â€”Â XAU/USD unavailable Ã¢â‚¬â€ using PAXGUSDT gold proxy';
-        const parsed=a.map(x=>({t:x[0],o:Number(x[1]),h:Number(x[2]),l:Number(x[3]),c:Number(x[4]),v:Number(x[5])})).filter(x=>[x.o,x.h,x.l,x.c].every(Number.isFinite)); if(parsed.length>=30) return parsed;
+        const parsed=a.map(x=>({t:x[0],o:Number(x[1]),h:Number(x[2]),l:Number(x[3]),c:Number(x[4]),v:Number(x[5])})).filter(x=>[x.o,x.h,x.l,x.c].every(Number.isFinite)); if(parsed.length>=10) return parsed;
       }
     }
   }
@@ -143,7 +143,7 @@ async function finishScanAnimation(success=true){
 
 function analyzeSeries(data,higherData=[]){
   const clean=(data||[]).map(x=>x&&({t:x.t,o:Number(x.o),h:Number(x.h),l:Number(x.l),c:Number(x.c),v:Number(x.v||0)})).filter(x=>x&&[x.o,x.h,x.l,x.c].every(Number.isFinite)&&x.h>=x.l&&x.h>=x.o&&x.h>=x.c&&x.l<=x.o&&x.l<=x.c);
-  if(clean.length<30) throw new Error('Not enough valid market candles for technical analysis.');
+  if(clean.length<10) throw new Error('Not enough valid market candles for technical analysis.');
   const closes=clean.map(x=>x.c),i=closes.length-1,price=closes[i];
   const e9=ema(closes,9),e21=ema(closes,21),e50=ema(closes,50),rr=rsi(closes),aa=atr(clean),mf=ema(closes,12),ms=ema(closes,26),md=mf.map((x,k)=>x-ms[k]),sig=ema(md,9);
   const trend=e9[i]>e21[i]&&e21[i]>e50[i]?1:e9[i]<e21[i]&&e21[i]<e50[i]?-1:0;
