@@ -50,7 +50,9 @@ Recent live candles: ${JSON.stringify(recent)}
 Higher-timeframe candles: ${JSON.stringify(higher)}
 
 Return ONLY valid JSON with exactly these keys:
-{"bias":"BUY|SELL|WAIT","confidence":0,"entry":0,"stop_loss":0,"tp1":0,"tp2":0,"timeframe":"","visual_structure":"","patterns":[],"support":0,"resistance":0,"confluence":[],"invalidation":"","reason":"","agreement":"AGREE|MIXED|DISAGREE"}
+{"bias":"BUY|SELL|WAIT","confidence":0,"entry":0,"stop_loss":0,"tp1":0,"tp2":0,"timeframe":"","detected_symbol":"","detected_market":"","visual_structure":"","patterns":[],"support":0,"resistance":0,"confluence":[],"invalidation":"","reason":"","agreement":"AGREE|MIXED|DISAGREE"}
+
+Detection rules: If the chart header/axis/watermark clearly shows an instrument (for example XAUUSD, GOLD, BTCUSDT, EURUSD), return it in detected_symbol using a normalized symbol when possible. If the chart clearly shows a timeframe (for example 15m, 1H, 4H, 1D), return it in timeframe. If either is not readable, return an empty string instead of guessing.
 
 Rules: confidence must be 0-100. If validation.winRate is below 80, or validation.trades is too small, prefer WAIT unless the setup is exceptionally clear; never fake the validation number. Entry/SL/TP should be realistic relative to current price and volatility. Use the visible chart to describe structure, but use live data for exact current price.`;
 
@@ -69,6 +71,4 @@ Rules: confidence must be 0-100. If validation.winRate is below 80, or validatio
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`TradePilot AI server running on port ${PORT}`);
-});
+app.listen(PORT,'0.0.0.0',()=>console.log(`TradePilot AI server running on port ${PORT}`));

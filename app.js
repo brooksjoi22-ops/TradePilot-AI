@@ -297,6 +297,15 @@ async function scanUploadedChart(){
   const validation=await validationBacktest(candles);
   $('scanText').textContent='AI vision is reading chart structure and candle patterns...';
   const ai=await aiVisionAnalyze(validation,technical);
+  if(ai){
+    const detectedTf=String(ai.timeframe||'').toLowerCase().replace(/\s+/g,'');
+    const tfMap={'1m':'1min','1min':'1min','5m':'5min','5min':'5min','15m':'15min','15min':'15min','30m':'30min','30min':'30min','1h':'1h','1hr':'1h','1hour':'1h','4h':'1day','1d':'1day','1day':'1day'};
+    if(tfMap[detectedTf]) timeframe.value=tfMap[detectedTf];
+    const ds=String(ai.detected_symbol||'').toUpperCase().replace(/\s+/g,'');
+    const symbolMap={'XAUUSD':'XAU/USD','XAU/USD':'XAU/USD','GOLD':'XAU/USD','BTCUSD':'BTCUSDT','BTCUSDT':'BTCUSDT','ETHUSD':'ETHUSDT','ETHUSDT':'ETHUSDT','SOLUSD':'SOLUSDT','SOLUSDT':'SOLUSDT','BNBUSDT':'BNBUSDT','XRPUSDT':'XRPUSDT'};
+    if(symbolMap[ds]){ symbol.value=symbolMap[ds]; marketType.value=symbolMap[ds]==='XAU/USD'?'gold':'crypto'; }
+    if(ai.detected_symbol||ai.timeframe) $('dataStatus').textContent='● Detected: '+(ai.detected_symbol||symbol.value)+' · '+(ai.timeframe||timeframe.options[timeframe.selectedIndex].text);
+  }
 
   let final=technical;
   if(ai){
