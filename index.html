@@ -1,17 +1,15 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TradePilot AI â€” AI Chart Scanner for Gold, Forex & Crypto</title>
+<title>TradePilot AI — AI Chart Scanner for Gold, Forex & Crypto</title>
 <meta name="description" content="TradePilot AI analyzes uploaded trading charts, detects the instrument and timeframe, cross-checks live market candles, and builds a transparent BUY, SELL or WAIT trade plan.">
 <meta name="robots" content="index,follow">
-<link rel="canonical" href="https://tradepilot-ai-production.up.railway.app/">
-<meta property="og:title" content="TradePilot AI â€” AI Chart Scanner">
+<meta property="og:title" content="TradePilot AI — AI Chart Scanner">
 <meta property="og:description" content="Upload a trading chart. Detect symbol and timeframe, cross-check live market data, and get a transparent trade analysis.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://tradepilot-ai-production.up.railway.app/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"TradePilot AI","url":"https://tradepilot-ai-production.up.railway.app/","applicationCategory":"FinanceApplication","description":"AI-assisted trading chart scanner for Gold, Forex and Crypto with live market cross-checking and transparent trade plans."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"TradePilot AI","applicationCategory":"FinanceApplication","description":"AI-assisted trading chart scanner for Gold, Forex and Crypto with live market cross-checking and transparent trade plans."}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,7 +17,7 @@
 </head>
 <body>
 <header class="nav">
-  <div class="brand"><span class="brand-mark">â—ˆ</span> TradePilot AI</div>
+  <div class="brand"><span class="brand-mark">◈</span> TradePilot AI</div>
   <nav><a href="#analyzer">Scanner</a><a href="#journal">Journal</a><a href="#backtest">Backtest</a><a href="#calendar">Calendar</a></nav>
   <button class="btn ghost" onclick="document.getElementById('apiBox').classList.toggle('show')">Data settings</button>
 </header>
@@ -36,16 +34,17 @@
 <section class="panel" id="analyzer">
   <div class="section-title">
     <div><span class="eyebrow">MARKET SCANNER</span><h2>Live analysis</h2></div>
-    <span class="status" id="dataStatus">â— Ready</span>
+    <span class="status" id="dataStatus">● Ready</span>
   </div>
 
   <div class="upload-card" id="uploadCard">
     <div class="upload-copy">
-      <span class="upload-icon">â†¥</span>
-      <div><b>Upload chart screenshot</b><small>PNG, JPG or WEBP Â· Drag & drop or choose a file</small></div>
+      <span class="upload-icon">↥</span>
+      <div><b>Upload chart screenshot</b><small>PNG, JPG or WEBP · Drag & drop or choose a file</small></div>
     </div>
-    <input id="chartUpload" type="file" accept="image/png,image/jpeg,image/webp,image/gif" aria-label="Upload chart file" />
-    <div class="upload-preview" id="uploadPreview"><img id="uploadedImage" alt="Uploaded chart preview"><button type="button" id="removeUpload">Ã—</button></div>
+    <input id="chartUpload" type="file" accept="image/*,.png,.jpg,.jpeg,.webp" aria-label="Choose chart image" />
+    <button type="button" class="btn upload-btn" id="chooseChartBtn">Choose chart image</button>
+    <div class="upload-preview" id="uploadPreview"><img id="uploadedImage" alt="Uploaded chart preview"><button type="button" id="removeUpload">×</button></div>
     <div class="scan-error" id="scanError" role="alert"></div>
   </div>
 
@@ -59,7 +58,7 @@
     </label>
     <label>Symbol
       <select id="symbol">
-        <option value="XAU/USD">XAU/USD â€” Gold</option>
+        <option value="XAU/USD">XAU/USD — Gold</option>
         <option value="BTCUSDT">BTCUSDT</option>
         <option value="ETHUSDT">ETHUSDT</option>
         <option value="SOLUSDT">SOLUSDT</option>
@@ -81,13 +80,13 @@
   </div>
 
   <div class="chart-card">
-    <div class="chart-head"><b id="chartTitle">BTCUSDT Â· 1 Minute</b><span id="priceBadge">--</span></div>
+    <div class="chart-head"><b id="chartTitle">BTCUSDT · 1 Minute</b><span id="priceBadge">--</span></div>
     <canvas id="marketChart" height="250"></canvas>
   </div>
 
   <div class="scan-animation" id="scanAnimation" aria-live="polite">
     <div class="scan-animation-inner">
-      <div class="scan-head"><span class="scan-ring">â—Œ</span><div><span class="eyebrow">REAL-TIME ANALYSIS</span><b id="scanText">Fetching live candles...</b></div><strong id="scanPercent">0%</strong></div>
+      <div class="scan-head"><span class="scan-ring">◌</span><div><span class="eyebrow">REAL-TIME ANALYSIS</span><b id="scanText">Fetching live candles...</b></div><strong id="scanPercent">0%</strong></div>
       <div class="scan-progress"><i id="scanProgress"></i></div>
       <div class="scan-status"><span class="scan-dot"></span><span>Live market data + chart structure</span></div>
     </div>
@@ -95,7 +94,7 @@
 
   <div class="result" id="result">
     <div class="result-top">
-      <div><span class="eyebrow" id="resultEyebrow">AI CHART-VISION + LIVE MARKET</span><h3 id="resultSymbol">BTCUSDT Â· 1m</h3></div>
+      <div><span class="eyebrow" id="resultEyebrow">AI CHART-VISION + LIVE MARKET</span><h3 id="resultSymbol">BTCUSDT · 1m</h3></div>
       <div class="score"><span id="score">--</span><small>AI confidence</small></div>
     </div>
     <div class="metrics">
@@ -155,7 +154,7 @@
 <div class="event"><time>LIVE</time><div><b>Use your preferred economic calendar</b><span>Event data is not fabricated by this demo.</span></div></div>
 </section>
 </main>
-<footer>TradePilot AI Â· Live market technical scanner Â· Educational use only Â· Not financial advice</footer>
+<footer>TradePilot AI · Live market technical scanner · Educational use only · Not financial advice</footer>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="app.js"></script>
 </body>
