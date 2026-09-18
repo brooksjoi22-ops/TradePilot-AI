@@ -1,4 +1,4 @@
-const $=id=>document.getElementById(id);
+﻿const $=id=>document.getElementById(id);
 const marketType=$('marketType'), symbol=$('symbol'), timeframe=$('timeframe'), scanBtn=$('scanBtn');
 const chart=$('marketChart'), ctx=chart.getContext('2d');
 let candles=[], recent=[], uploadedChartFile=null;
@@ -7,13 +7,39 @@ const higherTf={"1min":"5min","5min":"15min","15min":"1h","30min":"1h","1h":"1da
 const cryptoSymbols=['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','ADAUSDT','DOGEUSDT','AVAXUSDT','LINKUSDT','DOTUSDT','TRXUSDT','LTCUSDT','BCHUSDT','ATOMUSDT','UNIUSDT','ETCUSDT','FILUSDT','APTUSDT','NEARUSDT','OPUSDT','ARBUSDT','SUIUSDT','PEPEUSDT','SHIBUSDT'];
 
 const uploadCard=$('uploadCard'), chartUpload=$('chartUpload'), uploadPreview=$('uploadPreview'), uploadedImage=$('uploadedImage'), removeUpload=$('removeUpload');
-const uploadBtn=$('chooseChartBtn');
-if(uploadBtn) uploadBtn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();chartUpload.click();});
-chartUpload.addEventListener('change',e=>handleChartFile(e.target.files&&e.target.files[0]));
-['dragenter','dragover'].forEach(ev=>uploadCard.addEventListener(ev,e=>{e.preventDefault();uploadCard.classList.add('dragover')}));
-['dragleave','drop'].forEach(ev=>uploadCard.addEventListener(ev,e=>{e.preventDefault();uploadCard.classList.remove('dragover')}));
-uploadCard.addEventListener('drop',e=>handleChartFile(e.dataTransfer.files[0]));
-removeUpload.addEventListener('click',()=>{chartUpload.value='';uploadedChartFile=null;uploadedImage.removeAttribute('src');uploadPreview.classList.remove('show');scanBtn.textContent='Scan live market';$('dataStatus').textContent='â— Ready'});
+
+chartUpload.addEventListener('change',e=>{
+  const file=e.target.files && e.target.files[0];
+  handleChartFile(file);
+});
+
+['dragenter','dragover'].forEach(ev=>uploadCard.addEventListener(ev,e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  uploadCard.classList.add('dragover');
+}));
+
+['dragleave','drop'].forEach(ev=>uploadCard.addEventListener(ev,e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  uploadCard.classList.remove('dragover');
+}));
+
+uploadCard.addEventListener('drop',e=>{
+  const file=e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(file){
+    handleChartFile(file);
+  }
+});
+
+removeUpload.addEventListener('click',()=>{
+  chartUpload.value='';
+  uploadedChartFile=null;
+  uploadedImage.removeAttribute('src');
+  uploadPreview.classList.remove('show');
+  scanBtn.textContent='Scan live market';
+  $('dataStatus').textContent='Ready';
+});
 function handleChartFile(file){
   if(!file)return;
   const looksLikeImage=file.type?.startsWith('image/') || /\.(png|jpe?g|webp|gif)$/i.test(file.name||'');
@@ -22,7 +48,7 @@ function handleChartFile(file){
   $('scanError').classList.remove('show');
   uploadedChartFile=file;
   const reader=new FileReader();
-  reader.onload=()=>{ uploadedImage.src=reader.result; uploadPreview.classList.add('show'); scanBtn.textContent='Scan uploaded chart'; $('dataStatus').textContent='â— Chart ready â€” click Scan uploaded chart'; };
+  reader.onload=()=>{ uploadedImage.src=reader.result; uploadPreview.classList.add('show'); scanBtn.textContent='Scan uploaded chart'; $('dataStatus').textContent='Ã¢â€”Â Chart ready Ã¢â‚¬â€ click Scan uploaded chart'; };
   reader.onerror=()=>{ uploadedChartFile=null; uploadPreview.classList.remove('show'); $('scanError').textContent='Browser could not read this image. Try saving the chart as JPG or PNG and upload again.'; $('scanError').classList.add('show'); };
   reader.readAsDataURL(file);
 }
@@ -31,10 +57,10 @@ function handleChartFile(file){
 marketType.addEventListener('change', async()=>{
   const type=marketType.value;
   if(type==='crypto') symbol.innerHTML=cryptoSymbols.map(s=>`<option value="${s}">${s}</option>`).join('');
-  else if(type==='gold') symbol.innerHTML='<option value="XAU/USD">XAU/USD â€” Gold</option>';
+  else if(type==='gold') symbol.innerHTML='<option value="XAU/USD">XAU/USD Ã¢â‚¬â€ Gold</option>';
   else {const key=sessionStorage.getItem('tdKey');if(!key){symbol.innerHTML='<option value="EUR/USD">EUR/USD</option><option value="GBP/USD">GBP/USD</option><option value="USD/JPY">USD/JPY</option><option value="USD/CAD">USD/CAD</option><option value="AUD/USD">AUD/USD</option>';return;}symbol.innerHTML='<option>Loading pairs...</option>';try{const r=await fetch(`https://api.twelvedata.com/forex_pairs?apikey=${encodeURIComponent(key)}`);const j=await r.json();if(j.data?.length)symbol.innerHTML=j.data.map(x=>`<option value="${x.symbol}">${x.symbol}</option>`).join('');}catch(e){symbol.innerHTML='<option value="EUR/USD">EUR/USD</option>';}}
 });
-$('saveKey').onclick=()=>{const k=$('tdKey').value.trim();if(k){sessionStorage.setItem('tdKey',k);$('keyStatus').textContent='API key saved for this browser session.';$('dataSource').textContent='Twelve Data';$('dataStatus').textContent='â— Twelve Data ready for live Forex/Gold candles';}};
+$('saveKey').onclick=()=>{const k=$('tdKey').value.trim();if(k){sessionStorage.setItem('tdKey',k);$('keyStatus').textContent='API key saved for this browser session.';$('dataSource').textContent='Twelve Data';$('dataStatus').textContent='Ã¢â€”Â Twelve Data ready for live Forex/Gold candles';}};
 
 async function getData(forTf=null, limit=180){
   const type=marketType.value,sym=symbol.value,tf=forTf||timeframe.value,apiInterval=intervalMap[tf]||tf;
@@ -61,7 +87,7 @@ async function getData(forTf=null, limit=180){
       const a=await br.json();
       if(Array.isArray(a)&&a.length){
         $('dataSource').textContent='Gold proxy (PAXGUSDT)';
-        $('dataStatus').textContent='â— XAU/USD unavailable â€” using PAXGUSDT gold proxy';
+        $('dataStatus').textContent='Ã¢â€”Â XAU/USD unavailable Ã¢â‚¬â€ using PAXGUSDT gold proxy';
         const parsed=a.map(x=>({t:x[0],o:Number(x[1]),h:Number(x[2]),l:Number(x[3]),c:Number(x[4]),v:Number(x[5])})).filter(x=>[x.o,x.h,x.l,x.c].every(Number.isFinite)); if(parsed.length>=30) return parsed;
       }
     }
@@ -109,7 +135,7 @@ async function finishScanAnimation(success=true){
   }
   $('scanProgress').style.width=success?'100%':'0%';
   $('scanPercent').textContent=success?'100%':'0%';
-  $('scanText').textContent=success?'Analysis complete â€” preparing result...':'Analysis stopped';
+  $('scanText').textContent=success?'Analysis complete Ã¢â‚¬â€ preparing result...':'Analysis stopped';
   await new Promise(r=>setTimeout(r,success?650:0));
   $('scanAnimation').classList.remove('active');
   uploadPreview.classList.remove('scanning');
@@ -150,9 +176,9 @@ function setResult(a,mode='Live',ai=null,validation=null){
   const safePrice=Number.isFinite(Number(a.price))?Number(a.price):(Number.isFinite(lastClose)?lastClose:NaN);
   const rawSide=String(a.side||'').toUpperCase();
   const safeSide=['BUY','SELL','WAIT'].includes(rawSide)?rawSide:'WAIT';
-  $('chartTitle').textContent=`${symbol.value} Â· ${tfText}`;
+  $('chartTitle').textContent=`${symbol.value} Ã‚Â· ${tfText}`;
   $('priceBadge').textContent=fmt(safePrice);
-  $('resultSymbol').textContent=`${symbol.value} Â· ${tfText} Â· ${mode}`;
+  $('resultSymbol').textContent=`${symbol.value} Ã‚Â· ${tfText} Ã‚Â· ${mode}`;
   const rawConf=ai?.confidence!=null?Number(ai.confidence):Number(a.score); const conf=Number.isFinite(rawConf)?Math.max(0,Math.min(99,Math.round(rawConf))):50;
   $('score').textContent=conf+'%';
   $('bias').textContent=safeSide;
@@ -174,7 +200,7 @@ function setResult(a,mode='Live',ai=null,validation=null){
   const wr=validation?.winRate;
   $('validationBadge').textContent=wr==null?'Not tested':`${wr.toFixed(1)}% historical`;
   $('rationale').textContent=ai?.reason||`${mode} ${marketType.value} analysis on ${tfText}. Technical confluence: EMA, RSI, MACD, momentum, ATR, support/resistance and higher timeframe.`;
-  $('aiReason').textContent=ai?`AI vision: ${ai.reason||'Visual chart structure cross-checked with live market data.'}`:'AI vision unavailable â€” using technical engine only.';
+  $('aiReason').textContent=ai?`AI vision: ${ai.reason||'Visual chart structure cross-checked with live market data.'}`:'AI vision unavailable Ã¢â‚¬â€ using technical engine only.';
   $('resultEyebrow').textContent=ai?'AI CHART-VISION + LIVE MARKET':'LIVE TECHNICAL ANALYSIS';
   $('result').style.display='block';
 }
@@ -253,7 +279,7 @@ async function aiVisionAnalyze(validation,technical){
     return j.analysis;
   }catch(e){
     console.warn('AI vision unavailable',e);
-    $('aiReason').textContent='AI vision unavailable: '+e.message+' â€” technical live scan will still be shown.';
+    $('aiReason').textContent='AI vision unavailable: '+e.message+' Ã¢â‚¬â€ technical live scan will still be shown.';
     return null;
   }
 }
@@ -352,13 +378,14 @@ async function localChartFallback(){
 
 async function scanUploadedChart(){
   if(!uploadedChartFile)throw new Error('Upload a chart first.');
+  try{
   const detectedTf=await detectTimeframeFromImage(uploadedChartFile);
   if(detectedTf){
     timeframe.value=detectedTf;
-    dataStatus.textContent='● Timeframe detected from chart: '+timeframe.options[timeframe.selectedIndex].text;
+    dataStatus.textContent='â— Timeframe detected from chart: '+timeframe.options[timeframe.selectedIndex].text;
     console.log('CHART TIMEFRAME DETECTED:',detectedTf);
   }else{
-    dataStatus.textContent='● Timeframe not readable from image; AI visual verification will continue';
+    dataStatus.textContent='â— Timeframe not readable from image; AI visual verification will continue';
   }
   } catch(liveErr) {
     console.warn('Live Gold data unavailable; using local chart fallback', liveErr);
@@ -382,7 +409,7 @@ async function scanUploadedChart(){
     const ds=String(ai.detected_symbol||'').toUpperCase().replace(/\s+/g,'');
     const symbolMap={'XAUUSD':'XAU/USD','XAU/USD':'XAU/USD','GOLD':'XAU/USD','BTCUSD':'BTCUSDT','BTCUSDT':'BTCUSDT','ETHUSD':'ETHUSDT','ETHUSDT':'ETHUSDT','SOLUSD':'SOLUSDT','SOLUSDT':'SOLUSDT','BNBUSDT':'BNBUSDT','XRPUSDT':'XRPUSDT'};
     if(symbolMap[ds]){ symbol.value=symbolMap[ds]; marketType.value=symbolMap[ds]==='XAU/USD'?'gold':'crypto'; }
-    if(ai.detected_symbol||ai.timeframe) $('dataStatus').textContent='â— Detected: '+(ai.detected_symbol||symbol.value)+' Â· '+(ai.timeframe||timeframe.options[timeframe.selectedIndex].text);
+    if(ai.detected_symbol||ai.timeframe) $('dataStatus').textContent='Ã¢â€”Â Detected: '+(ai.detected_symbol||symbol.value)+' Ã‚Â· '+(ai.timeframe||timeframe.options[timeframe.selectedIndex].text);
   }
 
   // Final signal is driven by the transparent bullish/bearish evidence score.
@@ -396,7 +423,7 @@ async function scanUploadedChart(){
     if(ai.tp2) final.tp2=Number(ai.tp2)||technical.tp2;
   }
   setResult(final,'AI chart scan',ai,validation);
-  $('dataStatus').textContent=ai?'â— AI chart + live market scan complete':'â— Live market scan complete (AI server not connected)';
+  $('dataStatus').textContent=ai?'Ã¢â€”Â AI chart + live market scan complete':'Ã¢â€”Â Live market scan complete (AI server not connected)';
   if(!$('dataSource').textContent.includes('proxy')) $('dataSource').textContent=marketType.value==='crypto'?'Binance live candles':'Twelve Data live candles';
   recent.unshift({s:symbol.value,b:$('bias').textContent,p:fmt(candles[candles.length-1].c)}); recent=recent.slice(0,6);
   $('recentScans').innerHTML=recent.map(x=>`<div class="trade"><span>${x.s} <small>${x.b}</small></span><b>${x.p}</b></div>`).join('');
@@ -419,14 +446,14 @@ scanBtn.onclick=async()=>{
       const higher=await getData(higherTf[timeframe.value]||timeframe.value);
       $('scanText').textContent='Running EMA, RSI, MACD, momentum and ATR...';
       const technical=analyzeSeries(candles,higher); if(!Number.isFinite(technical.price) && candles.length) technical.price=Number(candles[candles.length-1].c); if(!['BUY','SELL','WAIT'].includes(technical.side)) technical.side='WAIT'; setResult(technical,'Live scan');
-      $('dataStatus').textContent='â— Live data updated';
+      $('dataStatus').textContent='Ã¢â€”Â Live data updated';
       recent.unshift({s:symbol.value,b:$('bias').textContent,p:fmt(candles[candles.length-1].c)});
       recent=recent.slice(0,6);
       $('recentScans').innerHTML=recent.map(x=>`<div class="trade"><span>${x.s} <small>${x.b}</small></span><b>${x.p}</b></div>`).join('');
     }
     await finishScanAnimation(true);
   }catch(e){
-    $('dataStatus').textContent='â— Scan error';
+    $('dataStatus').textContent='Ã¢â€”Â Scan error';
     await finishScanAnimation(false);
     $('scanError').textContent='Scan failed: '+(e.message||e);
     $('scanError').classList.add('show');
@@ -436,6 +463,8 @@ scanBtn.onclick=async()=>{
 };
 $('runBacktest').onclick=async()=>{const out=$('backtestOutput');out.style.display='block';out.textContent='Loading historical candles and running backtest...';try{const data=await getData(timeframe.value,1000);if(data.length<200)throw new Error('Not enough historical candles');let wins=0,losses=0,trades=0,pnlR=0;for(let i=120;i<data.length-3;i++){const slice=data.slice(0,i+1),a=analyzeSeries(slice,[]);if(a.side==='WAIT')continue;trades++;const entry=data[i].c,sl=a.sl,tp=a.side==='BUY'?a.tp2:a.tp2;let result=0;for(let j=i+1;j<data.length;j++){if(a.side==='BUY'){if(data[j].l<=sl){result=-1;break}if(data[j].h>=tp){result=2.5;break}}else{if(data[j].h>=sl){result=-1;break}if(data[j].l<=tp){result=2.5;break}}}if(result>0){wins++;pnlR+=result}else{losses++;pnlR+=result}}const winRate=trades?wins/trades*100:0;out.innerHTML=`<b>Backtest result</b><br>Trades: ${trades}<br>Wins: ${wins}<br>Losses: ${losses}<br>Win rate: <strong>${winRate.toFixed(1)}%</strong><br>Net R: ${pnlR.toFixed(2)}R<br><small>Simple historical test of the same confluence engine; not a guarantee of future results.</small>`}catch(e){out.textContent='Backtest failed: '+e.message}};
 window.addEventListener('resize',draw);
+
+
 
 
 
