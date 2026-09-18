@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Sitemap: https://tradepilot-ai-production.up.railway.app/sitemap.xml
