@@ -626,3 +626,66 @@ function backtestLiveStrategy(data, baseTf){
     }
   };
 }
+
+$('runBacktest').onclick=async()=>{
+  const out=$('backtestOutput');
+  out.style.display='block';
+  out.textContent='Loading historical candles and running the synchronized strategy...';
+
+  try{
+    const baseTf=timeframe.value;
+    const data=await getData(baseTf,1000);
+
+    if(data.length<220){
+      throw new Error('Not enough historical candles');
+    }
+
+    const r=backtestLiveStrategy(data,baseTf);
+    const a=r.all;
+    const ins=r.ins;
+    const oos=r.oos;
+
+    const pf=Number.isFinite(a.profitFactor)
+      ?a.profitFactor.toFixed(2)
+      :'∞';
+
+    out.innerHTML=`
+      <b>Backtest result — synchronized ${timeframe.options[timeframe.selectedIndex].text} strategy</b><br>
+      Trades: ${a.trades}<br>
+      Wins: ${a.wins}<br>
+      Losses: ${a.losses}<br>
+      Timeouts: ${a.timeouts}<br>
+      Win rate: <strong>${a.winRate.toFixed(1)}%</strong><br>
+      Net R: <strong>${a.netR.toFixed(2)}R</strong><br>
+      Expectancy: ${a.expectancy.toFixed(3)}R/trade<br>
+      Profit factor: ${pf}<br>
+      Max drawdown: ${a.maxDD.toFixed(2)}R<br>
+      BUY: ${a.buy.trades} trades / ${a.buy.wins} wins / ${a.buy.losses} losses / ${a.buy.netR.toFixed(2)}R<br>
+      SELL: ${a.sell.trades} trades / ${a.sell.wins} wins / ${a.sell.losses} losses / ${a.sell.netR.toFixed(2)}R<br><br>
+
+      <b>70% in-sample:</b>
+      ${ins.trades} trades ·
+      ${ins.winRate.toFixed(1)}% win rate ·
+      ${ins.netR.toFixed(2)}R<br>
+
+      <b>30% out-of-sample:</b>
+      ${oos.trades} trades ·
+      ${oos.winRate.toFixed(1)}% win rate ·
+      ${oos.netR.toFixed(2)}R<br>
+
+      <small>
+        Higher timeframe uses only completed historical candles.
+        Entry is the signal candle close.
+        Horizon is timeframe-adjusted
+        (1m=30, 5m=18, 15m=12, 30m=10, 1h=8, 1d=5) candles.
+        TP1 is 1R and TP2 is 1.7R.
+        Same-candle SL/TP is handled conservatively with SL first.
+        This is validation, not a guarantee of future performance.
+      </small>
+    `;
+  }catch(e){
+    out.textContent='Backtest failed: '+e.message;
+  }
+};
+
+window.addEventListener('resize',draw);
